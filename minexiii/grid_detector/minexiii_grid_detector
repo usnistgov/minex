@@ -1,0 +1,162 @@
+#!/usr/bin/env Rscript
+# This software was developed at the National Institute of Standards and
+# Technology (NIST) by employees of the Federal Government in the course
+# of their official duties. Pursuant to title 17 Section 105 of the
+# United States Code, this software is not subject to copyright protection
+# and is in the public domain. NIST assumes no responsibility whatsoever for
+# its use by other parties, and makes no guarantees, expressed or implied,
+# about its quality, reliability, or any other characteristic.
+
+################################################################################
+# Test for periodic patterns in minutia placement density functions.           #
+# http://github.com/usnistgov/minex                                            #
+#                                                                              #
+# Using PNG input requires 'png,' available from:                              #
+# https://cran.r-project.org/web/packages/png/index.html                       #
+# Please note that using 8-bit graysalce PNG input is an approximation due to  #
+# scaling of values in the range [0, 255].                                     #
+################################################################################
+
+# Cut-off for accept/reject decision
+MINEXIII.PERIODIC.THRESHOLD   <- 0.002 
+
+# Load a minutia density file and convert to density matrix.
+get.density.matrix <- function(minutia.file, image.size)
+{
+	# Read in as data frame.
+	minutia.data <- read.table(minutia.file, header = TRUE, sep = ",")
+
+	# Convert to density matrix.
+	minutia.density <- matrix(0, nrow = image.size, ncol = image.size)
+	minutia.density[cbind(minutia.data$x + 1, minutia.data$y + 1)] <-
+	    minutia.data$count
+
+	minutia.density
+}
+
+# Apply windowing to density matrix.
+apply.windowing <- function(density.matrix)
+{
+	w <- ncol(density.matrix)
+	h <- nrow(density.matrix)
+
+	wx <- sin(pi * 0:(w-1) / (w-1))
+	wy <- sin(pi * 0:(h-1) / (h-1))
+
+	# Outer product to matrix form.
+	weights <- wy %o% wx
+
+	density.matrix * weights
+}
+
+# Convert minutia density plot to fourier representation.
+load.fft <- function(minutia.density)
+{
+	image.size <- nrow(minutia.density)
+
+	# Compute Fourier transform.
+	f <- fft(minutia.density)
+
+	# Take magnitude of complex number at each point.
+	f <- abs(f)
+
+	# Divide by average intensity over image.
+	f <- f / f[1,1]
+
+	# Flip quadrants I and III, and II and IV.
+	f <- f[,(1:image.size - image.size / 2) %% image.size]
+	f <- f[ (1:image.size - image.size / 2) %% image.size,]
+	f
+}
+
+# Black out center area of FFT (low-frequency area).
+blackout.center <- function(f, radius = 16)
+{
+	# Get distance of every point from center.
+	coords    <- expand.grid(x = 1:ncol(f), y = 1:nrow(f))
+	distances <- (coords$x - ncol(f) / 2)^2 + (coords$y - nrow(f) / 2)^2
+
+	# Indices of coordinates within the center radius.
+	indices <- distances <= radius^2
+
+	# Set to zero and return.
+	f[cbind(coords$x[indices], coords$y[indices])] <- 0
+	f
+}
+
+# Display FFT and density matrix (primarily for development purposes).
+display.fft <- function(density.matrix, f)
+{
+	# Open new X11 window
+	x11()
+
+	# Display both images.
+	par(mfrow = c(1, 2))                           # one row, two columns.
+
+	image(density.matrix, col = grey(0:255 / 255)) # display minutia density
+	image(f, col = grey(0:255/255))                # display Fourier space
+
+	# Convert to log scale for visualization.
+	f <- log(1 + f)
+
+	# Mark location of the absolute maximum in the image.
+	coords <- which(f == max(f), arr.ind = TRUE) 
+	points(coords[,1] / nrow(f), coords[,2] / nrow(f), col="darkred",
+	    cex=2, lwd=3)
+
+	# Wait for mouse click
+	locator(1)
+	print("Click inside image to close.")
+}
+
+# Get command line arguments.
+args <- commandArgs(trailingOnly = TRUE)
+args.error <- paste("\nUsage: minexiii_grid_detector <x_y_counts.csv>",
+    "<width_or_height>\n      ",
+    "minexiii_grid_detector <minutia_pdf.png>")
+
+if (length(args) < 1)
+	stop(args.error)
+if (!file.exists(args[1]))
+	stop(sprintf("%s does not exist", args[1]))
+
+extension <- tools::file_ext(args[1])
+if ((extension == "txt") || (extension == "csv")) {
+	if (length(args) != 2)
+		stop(args.error)
+
+	# Load density matrix and convert to density matrix.
+	density.matrix <- get.density.matrix(args[1], as.numeric(args[2]))
+} else if (extension == "png") {
+	if (length(args) != 1)
+		stop(args.error)
+
+	# Load PNG, converting pixels to a density matrix
+	# NOTE: This is an approximation, since values are scaled [0, 255].
+	density.matrix <- round(255 * t(png::readPNG(args[1])))
+} else {
+	stop(args.error);
+}
+
+stopifnot(exists("density.matrix"))
+
+density.matrix <- apply.windowing(density.matrix)
+
+# Convert to FFT.
+f <- load.fft(density.matrix)
+f <- blackout.center(f)
+
+# Find the maximum in the FFT.
+max.modulation <- max(f)
+decision       <- (max.modulation >= MINEXIII.PERIODIC.THRESHOLD)
+
+cat(sprintf("   File: %s\n", args[1]))
+cat(sprintf("Pattern: %s\n", decision))
+cat(sprintf("  Score: %.5f\n", round(max.modulation, 5)))
+
+# Display images.
+#display.fft(density.matrix, f)
+
+# Set return status
+quit(status = as.numeric(decision))
+
