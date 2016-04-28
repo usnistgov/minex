@@ -18,6 +18,10 @@ Contents
    (https://github.com/usnistgov/minex/tree/master/minexiii/grid_detector)
  	* A tool for detecting high frequency periodic structures in minutia
  	  placement density functions.
+ * [Validation]
+   (https://github.com/usnistgov/minex/tree/master/minexiii/validation)
+ 	* Package used to verify and submit MINEX III libraries for testing
+ 	  at NIST.
 
 Communication
 -------------
