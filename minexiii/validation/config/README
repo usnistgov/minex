@@ -1,0 +1,6 @@
+Place any required configuration files in this directory.
+
+During the test, this directory will have its permissions set to 555 and the
+owner will not be the effective user. The directory will be in the same
+directory as the executable.
+

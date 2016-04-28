@@ -1,0 +1,462 @@
+#!/bin/bash
+
+# URL containing the most recent version number of the validation package
+VALIDATION_VERS_URL="http://nigos.nist.gov:8080/evaluations/minexiii/validation/VERSION"
+# URL where information about the validation package can be found
+VALIDATION_PROMO_URL="http://www.nist.gov/itl/iad/ig/minexiii_participation.cfm"
+# URL where the complete validation package can be downloaded
+VALIDATION_DL_URL="http://nigos.nist.gov:8080/evaluations/minexiii/validation/latest.tar.bz2"
+# URL where validation source can be found on GitHub
+GITHUB_URL="https://github.com/usnistgov/minex/tree/master/minexiii/validation"
+
+# Directory containing validation materials
+WD=`readlink -f \`dirname $0\``
+# Version of the MINEX III validation package
+VALIDATION_VERSION=$(cat "${WD}"/VERSION)
+# Validation driver binary
+BINARY=minexiii_validation
+# Output directory specified in validation driver
+OUTPUT_DIR=`cat "${WD}"/minexiii_validation.h  | grep OUTPUT_DIR | sed 's/.*"\(.*\)".*/\1/g'`
+# Name of the file that logs compilation
+COMPILE_LOG=compile.log
+# Name of file that stores info on the template creation run
+CREATE_LOG=create.log
+# Name of file that stores info on the template matching run
+MATCH_LOG=match.log
+# Name of file that stores CBEFF info
+CBEFF_LOG=cbeff.log
+# Name of file that stores output from template validation
+TMPL_VALIDATION_LOG=template_validation.log
+# Name of directory where participant should place all libraries
+MINEX_LIB_DIR=lib
+# Name of directory where participant should place all libraries
+MINEX_CONFIG_DIR=config
+# Packages required to run this script
+REQUIRED_PKGS="binutils centos-release coreutils curl file gawk gcc grep iputils make sed which yum"
+
+# Make failing return codes persist across pipes
+set -o pipefail
+# Set dynamic library path to location of participant library
+export LD_LIBRARY_PATH="${WD}"/lib
+
+# Convenience function to print a failure method and exit
+# All params are echoed, one per line.
+fail()
+{
+	echo "[FAIL]"
+	if [ $# -ne 0 ]; then
+		echo
+		echo "********************************************************************************"
+		IFS=,
+		for i in $*; do
+			echo $i
+		done
+	fi
+	echo "********************************************************************************"
+	date
+	exit 1
+}
+
+date
+
+# Check for required packages
+echo -n "Checking for required packages... "
+which yum > /dev/null
+if [ $? -ne 0 ]; then
+	fail "which and yum are required to be installed for validation"
+fi
+for pkg in $REQUIRED_PKGS; do
+	yum -q list installed $pkg > /dev/null 2>&1
+	if [ $? -ne 0 ]; then
+		fail "The required package \"$pkg\" was not installed." \
+		    "Try \`yum install $pkg\` to install \"$pkg.\""
+	fi
+done
+echo "[OKAY]"
+
+# Confirm validation package version, if possible
+VALIDATION_VERSION_CHECKED=0
+echo -n "Checking validation version... "
+# d.root-servers.net -> 199.7.91.13
+ping -c 1 199.7.91.13 > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+	CURRENT_VERSION=`curl -m 10 -f $VALIDATION_VERS_URL 2>/dev/null`
+	if [ $? -ne 0 ]; then
+		echo "(connection failure) [SKIP]"
+	else
+		VALIDATION_VERSION_CHECKED=1
+		if [ "$CURRENT_VERSION" != "$VALIDATION_VERSION" ]; then
+			fail "You are running an old version of the validation package ($VALIDATION_VERSION)." "Please download $CURRENT_VERSION from:" $VALIDATION_DL_URL
+		else
+			echo "(${VALIDATION_VERSION}) [OKAY]"
+		fi
+	fi
+else
+	echo "(no Internet connection) [SKIP]"
+fi
+
+# Confirm OS
+CENTOS_VER="CentOS Linux release 7.0.1406 (Core)"
+echo -n "Checking OS Version... "
+if [ ! -e /etc/redhat-release ]; then 
+	fail "You do not appear to be using the appropriate operating system." \
+	    "Please use $CENTOS_VER."
+fi
+if [ "`cat /etc/redhat-release | sed -e s/[[:space:]]$//`" != "$CENTOS_VER" ]; then
+	fail "You do not appear to be using the appropriate CentOS version." \
+	    "Please use $CENTOS_VER."
+fi
+echo "(`echo $CENTOS_VER | awk '{print $1,$4}'`) [OKAY]"
+
+# Check for properly named library
+echo -n "Looking for core library... "
+core_lib=
+for libname in `ls "${WD}"/${MINEX_LIB_DIR} | grep -E libminexiii_[A-Za-z0-9]\+_\([0-9A-Fa-f]\+\|[0-9A-Fa-f]\{4\}\)\.\(a\|so\)`; do
+	if [ "${core_lib}" != "" ]; then
+		fail "More than one core library found. Rename:" \
+		    $libname
+	fi
+	core_lib=$libname
+done
+if [ "${core_lib}" == "" ]; then
+	fail "No core library found. Please review library naming conventions."
+fi
+
+# If SONAME is present, check that it is the same as the lib name
+file "${WD}"/${MINEX_LIB_DIR}/${core_lib} | grep shared > /dev/null
+if [ $? -eq 0 ]; then
+	SONAME=`objdump -p "${WD}"/${MINEX_LIB_DIR}/${core_lib} | grep SONAME | awk '{print $2}'`
+	if [ "$SONAME" != "" ]; then
+		if [ "$SONAME" != "${core_lib}" ]; then
+			fail "The SONAME of ${core_lib} is not valid. ${core_lib} was likely renamed after being built. The SONAME must be the same name as the MINEX III core library."
+		fi
+	fi
+fi
+COMPANY=`echo ${core_lib} | awk -F_ '{print $2}'`
+CBEFF_VERSION=`echo ${core_lib} | awk -F_ '{print $3}' | sed 's/\..*//' | tr '[:lower:]' '[:upper:]'`
+echo "($core_lib) [OKAY]"
+
+# Check for configuration files
+echo -n "Checking configuration files... "
+if [ -d "${WD}"/${MINEX_CONFIG_DIR} ]; then
+	num_config=0
+	for config in `ls "${WD}"/${MINEX_CONFIG_DIR}`; do
+		if [ "$config" != "README" ]; then
+			let num_config="$num_config + 1"
+		fi
+	done
+	if [ $num_config -gt 0 ]; then
+		if [ -w "${WD}"/${MINEX_CONFIG_DIR} ]; then
+			fail "${WD}/${MINEX_CONFIG_DIR} is writable but should be 555."
+		else
+			if [ $num_config -eq 1 ]; then
+				echo "($num_config config) [OKAY]"
+			else
+				echo "($num_config configs) [OKAY]"
+			fi
+		fi
+	else
+		echo "(no configs) [OKAY]"
+	fi
+else
+	echo "(no configs) [OKAY]"
+fi
+
+# Make log output directory
+echo -n "Checking for previous validation attempts... "
+output_found=`find "${WD}" -maxdepth 1 -type d -name "${OUTPUT_DIR}*" -print -quit`
+if [ "$output_found" != "" ]; then
+	fail "Please remove previous validation attempt:" "$output_found" \
+	    "" "\`make clean\` will bring you back to a clean state."
+fi
+mkdir -p "${WD}"/${OUTPUT_DIR}
+echo "[OKAY]"
+
+# Generate a random seed for the random number generator
+RANDOM_SEED=$(od -A n -t uL -N 4 /dev/urandom | tr -d ' \n')
+
+# Compile
+echo -n "Building... "
+make -C "${WD}" 2>&1 | tee "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG} > /dev/null
+if [ $? -ne 0 ]; then
+	fail "An error occurred during compilation. Please review:" \
+	    "${WD}/${OUTPUT_DIR}/${COMPILE_LOG}"
+fi
+md5sum "${WD}"/${MINEX_LIB_DIR}/* >> "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG}
+md5sum "${WD}"/${MINEX_CONFIG_DIR}/* >> "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG}
+cat /etc/redhat-release >> "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG}
+ldd "${WD}"/${BINARY} >> "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG}
+echo "Validation Version = ${VALIDATION_VERSION}" >> "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG}
+echo "Random Seed = ${RANDOM_SEED}" >> "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG}
+# Check that binary shows a dependency on the core library (if lib is shared)
+file "${WD}"/${MINEX_LIB_DIR}/${core_lib} | grep shared > /dev/null
+if [ $? -eq 0 ]; then
+	ldd "${WD}"/${BINARY} | grep "${WD}"/${MINEX_LIB_DIR}/${core_lib} 2>&1 > /dev/null
+	if [ $? -ne 0 ]; then
+		fail "${core_lib} is not required by ${BINARY}. ${core_lib} was either renamed after being built or ${BINARY} is linking against a version of ${core_lib} from a directory outside of the validation package. Please review:" \
+		"${WD}/${OUTPUT_DIR}/${COMPILE_LOG}"
+	fi
+fi
+echo "[OKAY]"
+
+# Check library version number
+echo -n "Gathering CBEFF info... "
+cd "${WD}" && { time "${WD}"/${BINARY} pid; } 2>&1 | \
+    tee "${WD}"/${OUTPUT_DIR}/${CBEFF_LOG} > /dev/null 
+if [ $? -ne 0 ]; then
+	fail 'An error occurred while gathering CBEFF info. Please review:' \
+	    "${WD}/${OUTPUT_DIR}/${CBEFF_LOG}"
+fi
+ret_CBEFF_VERSION=`head -n 2 "${WD}"/${OUTPUT_DIR}/${CBEFF_LOG} | tail -n 1 | awk '{print $2}' | tr '[:lower:]' '[:upper:]'`;
+if [ "$ret_CBEFF_VERSION" != "$CBEFF_VERSION" ]; then
+	fail "Core library name's version parameter is different than in get_pid()."
+else
+	echo "[OKAY]"
+fi
+
+# Save marketing name information
+echo "MINEXIII_GENERATOR_MARKETING_NAME='${MINEXIII_GENERATOR_MARKETING_NAME}'" >> "${WD}"/${OUTPUT_DIR}/${CBEFF_LOG}
+echo "MINEXIII_MATCHER_MARKETING_NAME='${MINEXIII_MATCHER_MARKETING_NAME}'" >> "${WD}"/${OUTPUT_DIR}/${CBEFF_LOG}
+
+# Run template creation
+echo -n "Generating templates... "
+cd "${WD}" && { time "${WD}"/${BINARY} create ${RANDOM_SEED}; } 2>&1 | \
+    tee "${WD}"/${OUTPUT_DIR}/${CREATE_LOG} > /dev/null 
+if [ $? -ne 0 ]; then
+	fail 'An error occurred during template creation. Please review:' \
+	    "${WD}/${OUTPUT_DIR}/${CREATE_LOG}"
+fi
+
+# Check lines of template creation log
+if [ `cat "${WD}"/${OUTPUT_DIR}/${CREATE_LOG} | wc -l` -ne 768 ]; then
+	fail "Invalid number of lines in template creation log. Please review:"\
+	    "${WD}/${OUTPUT_DIR}/${CREATE_LOG}"
+fi
+# Sort file so that subsequent runs are easily comparable by participant
+CREATE_LOG_TEMP=`mktemp -q "${WD}"/${OUTPUT_DIR}/${CREATE_LOG}.XXXXXXXX`
+if [ $? -eq 0 ]; then
+	# Remove header and footer
+	CREATE_LOG_HEADER=`head -n 1 "${WD}"/${OUTPUT_DIR}/${CREATE_LOG}`
+	CREATE_LOG_FOOTER=`tail -n 3 "${WD}"/${OUTPUT_DIR}/${CREATE_LOG}`
+	sed -i'' -e "/$CREATE_LOG_HEADER/d" "${WD}"/${OUTPUT_DIR}/${CREATE_LOG}
+	awk '{buf[NR-1]=$0;}END{for (i = 0; i < (NR - 4); i++) { print buf[i];}}' "${WD}"/${OUTPUT_DIR}/${CREATE_LOG} > "${CREATE_LOG_TEMP}"
+	sed -i'' -e "/$^/d" "${CREATE_LOG_TEMP}"
+	
+	sort "${CREATE_LOG_TEMP}" > "${WD}"/${OUTPUT_DIR}/${CREATE_LOG}
+
+	# Replace header and footer
+	echo "$CREATE_LOG_HEADER" | cat - "${WD}"/${OUTPUT_DIR}/${CREATE_LOG} > "${CREATE_LOG_TEMP}" && mv "${CREATE_LOG_TEMP}" "${WD}"/${OUTPUT_DIR}/${CREATE_LOG}
+	echo >> "${WD}"/${OUTPUT_DIR}/${CREATE_LOG}
+	echo "${CREATE_LOG_FOOTER}" >> "${WD}"/${OUTPUT_DIR}/${CREATE_LOG}
+fi
+# Check format of creation log
+unsuccessful_rv_g=0
+OLDIFS=$IFS; IFS=$'\n';
+for line in `sed -n "2,764 p" "${WD}"/${OUTPUT_DIR}/${CREATE_LOG}`; do
+	formatTest=`echo $line | sed 's/\(.*raw\)	[0-9]\+	[0-9]\{1,3\}/test/'`
+	if [ $? -ne 0 ] || [ "$formatTest" != "test" ]; then
+		fail "The template creation log is invalid. Please review:" \
+		    "${WD}/${OUTPUT_DIR}/${CREATE_LOG}" $line
+	fi
+
+	# Check for invalid template sizes
+	size=`echo $line | awk '{print $3}'`
+	let "sizeCheck = $size > 800"
+	if [ $sizeCheck -ne 0 ]; then
+		fail "There are invalid template sizes. Please review:" \
+	    	    "${WD}/${OUTPUT_DIR}/${CREATE_LOG}"
+	fi
+	let "sizeCheck = $size < 32"
+	if [ $sizeCheck -ne 0 ]; then
+		fail "There are invalid template sizes. Please review:" \
+	    	    "${WD}/${OUTPUT_DIR}/${CREATE_LOG}"
+	fi
+
+	# Check for successful return values
+	rv=`echo $line | awk '{print $2}'`
+	if [ $rv -ne 0 ]; then
+		unsuccessful_rv_g=1
+
+		# Failure to enroll should have 0 minutia
+		if [ $size -ne 32 ]; then
+			fail "Invalid template size on failure. Pleas review:" \
+	    	    	    "${WD}/${OUTPUT_DIR}/${CREATE_LOG}"
+		fi
+	fi
+done
+IFS=$OLDIFS
+
+echo "[OKAY]"
+
+# Run template matching
+echo -n "Matching templates... "
+cd "${WD}" && { time "${WD}"/${BINARY} match ${RANDOM_SEED}; } 2>&1 | tee "${WD}"/${OUTPUT_DIR}/${MATCH_LOG} > /dev/null
+if [ $? -ne 0 ]; then
+	fail "An error occurred during template matching. Please review:" \
+	    "${WD}/${OUTPUT_DIR}/${MATCH_LOG}"
+fi
+# Sort file so that subsequent runs are easily comparable by participant
+MATCH_LOG_TEMP=`mktemp -q "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}.XXXXXXXX`
+if [ $? -eq 0 ]; then
+	# Remove header and footer
+	MATCH_LOG_HEADER=`head -n 1 "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}`
+	MATCH_LOG_FOOTER=`tail -n 3 "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}`
+	sed -i'' -e "/$MATCH_LOG_HEADER/d" "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}
+	awk '{buf[NR-1]=$0;}END{for (i = 0; i < (NR - 4); i++) { print buf[i];}}' "${WD}"/${OUTPUT_DIR}/${MATCH_LOG} > "${MATCH_LOG_TEMP}"
+	sed -i'' -e "/$^/d" "${MATCH_LOG_TEMP}"
+	
+	sort "${MATCH_LOG_TEMP}" > "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}
+
+	# Replace header and footer
+	echo "$MATCH_LOG_HEADER" | cat - "${WD}"/${OUTPUT_DIR}/${MATCH_LOG} > "${MATCH_LOG_TEMP}" && mv "${MATCH_LOG_TEMP}" "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}
+	echo >> "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}
+	echo "${MATCH_LOG_FOOTER}" >> "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}
+fi 
+# Check lines of template matching log
+if [ `cat "${WD}"/${OUTPUT_DIR}/${MATCH_LOG} | wc -l` -ne 1855 ]; then
+	fail "Invalid number of lines in template matching log. Please review:"\
+	    "${WD}/${OUTPUT_DIR}/${MATCH_LOG}"
+fi
+
+# Check format of template matching log
+unsuccessful_rv_m=0
+uses_neg1=0
+OLDIFS=$IFS; IFS=$'\n';
+for line in `sed -n "2,1851 p" "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}`; do
+	# Check line format
+	formatTest=`echo $line | sed 's/\(.*tmpl\)	\(.*tmpl\)	\([0-9]\+\)	\(-\?[0-9]\+\.[0-9]*\|-\?[0-9]\+\)/test/'`
+	if [ $? -ne 0 ] || [ "$formatTest" != "test" ]; then
+		fail "The template matching log is invalid. Please review" \
+		    "${WD}/${OUTPUT_DIR}/${MATCH_LOG}" $line
+	fi
+
+	# Check for successful return values
+	rv=`echo $line | awk '{print $3}'`
+	if [ $rv -ne 0 ]; then
+		unsuccessful_rv_m=1
+	fi
+	
+	similarity=`echo $line | awk '{print $4}'`
+	echo $similarity | grep -e "-1" > /dev/null
+	if [ $? -eq 0 ]; then
+		uses_neg1=1
+	fi
+	
+done
+IFS=$OLDIFS
+echo "[OKAY]"
+
+
+# Warn about non-zero return values
+if [ $unsuccessful_rv_g -ne 0 ]; then
+	echo "*** [NOTE] There were some non-zero return values while generating templates."
+fi
+if [ $unsuccessful_rv_m -ne 0 ]; then
+	echo "*** [NOTE] There were some non-zero return values while matching templates."
+fi
+
+# Warn about using -1 as a similarity score
+if [ $uses_neg1 -ne 0 ]; then
+	echo "*** [NOTE] -1 used as a similarity value. MINEX III uses ALL similarity values"
+	echo "    when calculating FNMR."
+fi
+
+# Warn about missing marketing name information
+if [ "${MINEXIII_GENERATOR_MARKETING_NAME}" == "" ]; then
+	echo "*** [NOTE] You have not provided a marketing name for your template generator."
+	echo "           If you wanted to do so, be sure to set the environment variable"
+	echo "           'MINEXIII_GENERATOR_MARKETING_NAME' before running so this"
+	echo "           information can be recorded."
+fi
+if [ "${MINEXIII_MATCHER_MARKETING_NAME}" == "" ]; then
+	echo "*** [NOTE] You have not provided a marketing name for your template matcher."
+	echo "           If you wanted to do so, be sure to set the environment variable"
+	echo "           'MINEXIII_MATCHER_MARKETING_NAME' before running so this"
+	echo "           information can be recorded."
+fi
+
+#
+# Create the unencrypted submission
+#
+mv "${WD}"/$OUTPUT_DIR "${WD}"/${OUTPUT_DIR}_${COMPANY}_${CBEFF_VERSION}
+OUTPUT_DIR=${OUTPUT_DIR}_${COMPANY}_${CBEFF_VERSION}
+TAR_FILE="${OUTPUT_DIR}.tar.gz"
+echo -n "Creating validation submission (${TAR_FILE})... "
+
+# Move templates into subdirectory
+TEMPLATE_DIR="${WD}"/${OUTPUT_DIR}/templates
+mkdir -p "$TEMPLATE_DIR"
+find "${WD}"/${OUTPUT_DIR} -maxdepth 1 -name "*tmpl" -exec mv {} "$TEMPLATE_DIR" \;
+
+# Copy libs
+cp -pr "${WD}"/${MINEX_LIB_DIR} "${WD}"/${OUTPUT_DIR}
+if [ $? -ne 0 ]; then
+	fail "There was an issue copying libraries. Check permissions?"
+fi
+
+# Copy configs
+cp -pr "${WD}"/${MINEX_CONFIG_DIR} "${WD}"/${OUTPUT_DIR}
+if [ $? -ne 0 ]; then
+	fail "There was an issue copying configurations. Check permissions?"
+fi
+
+# Create archive
+cd "${WD}" && tar czf ${TAR_FILE} ${OUTPUT_DIR} > /dev/null
+if [ $? -ne 0 ]; then
+	fail "There was an issue creating the validation submission. Try again?"
+fi
+echo "[OKAY]"
+
+echo "
+--------------------------------------------------------------------------------
+You have successfully completed the first step in MINEX III validation. Please
+sign and encrypt this file, send it to minex@nist.gov, and await a notification.
+
+"${WD}"/${TAR_FILE}
+
+Example encryption:
+gpg --output ${TAR_FILE}.asc \\
+    --default-key jdoe@${COMPANY}.com --recipient minex@nist.gov \\
+    --recipient jdoe@${COMPANY}.com --armor --sign --encrypt \\
+    ${TAR_FILE}
+
+Additionally, be sure to include the public key of the identity that signed the 
+validation package. This key must be the key whose fingerprint was printed on
+the MINEX III application. If it is not, you will be required to submit a new 
+application.
+
+Example public key extraction:
+gpg --output ${COMPANY}_public_key.asc --armor \\
+    --export jdoe@${COMPANY}.com
+"
+
+CBEFF_TG_ID=`head -n 2 "${WD}"/${OUTPUT_DIR}/${CBEFF_LOG} | tail -n 1 | awk '{print $2}'`;
+if [ $CBEFF_TG_ID == "0000" ]; then
+	echo
+	echo "********************************************************************************
+IMPORTANT: If you are seeking client program compliance (such as PIV), you MUST
+register a CBEFF Product ID with IBIA, and set the appropriate values in
+get_pid(). NIST will not test algorithms for client program compliance without
+a registered CBEFF PID.
+********************************************************************************
+"
+fi
+
+if [ $VALIDATION_VERSION_CHECKED -eq 0 ]; then
+	echo
+	echo "********************************************************************************
+IMPORTANT: This script was unable to check, so please ensure that you are
+using the latest version of the MINEX III validation package before submitting.
+You are currently running with version $VALIDATION_VERSION.
+
+Information: $VALIDATION_PROMO_URL
+Version: $VALIDATION_VERS_URL
+Download: $VALIDATION_DL_URL
+
+Also available on GitHub: $GITHUB_URL
+********************************************************************************
+"
+fi
+
+date
+
