@@ -148,6 +148,12 @@ display.fft <- function(density.matrix, f)
 	print("Click inside image to close.")
 }
 
+max.gauss.element.norm.factor = function(NXNY)
+{
+	 div <- 2 * pi * log(NXNY^2 / (2*pi))
+	 sqrt(log(NXNY^2 / div)) * (1 + (-digamma(1) / log(NXNY)))
+}
+
 perform.grid.test <- function(density.path, image.size = NULL,
                               density.matrix = NULL)
 {
@@ -192,6 +198,19 @@ perform.grid.test <- function(density.path, image.size = NULL,
 
 	cat(sprintf("        Pattern: %s\n", decision))
 	cat(sprintf("          Score: %.5f\n", round(max.modulation, 5)))
+
+# 	if (!is.null(min.count)) {
+# 		norm.factor <- max.gauss.element.norm.factor(prod(
+# 		    dim(density.matrix)))
+#
+# 		# Should be approx 0.758 for uniformly random minutia without
+# 		# sine windowing.
+# 		max.modulation <- max.modulation * sqrt(min.count) / norm.factor
+#
+# 		cat(sprintf("   Normed Score: %.5f\n",
+# 		    round(max.modulation, 5)))
+# 		cat(sprintf("Normed Decision: %s\n", max.modulation > 1.5))
+# 	}
 
 	# Display images.
 #	display.fft(density.matrix, f)
