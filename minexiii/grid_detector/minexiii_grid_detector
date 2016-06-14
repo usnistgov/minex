@@ -173,7 +173,7 @@ perform.grid.test <- function(density.path, image.size = NULL,
 		} else if (extension == "png") {
 			cat(sprintf("           File: %s\n", density.path))
 
-			img <- png::readPNG(image_name)
+			img <- png::readPNG(density.path)
 
 			# If PNG file is RGB (if all gray, shouldn't matter
 			# which channel we pick).
