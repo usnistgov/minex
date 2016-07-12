@@ -53,13 +53,14 @@ Package Contents
 Requirements
 ------------
 
-The MINEX III validation package is required to be run on CentOS 7.0.1406. This
-is not the latest version of CentOS 7, but it is being required to remain
-consistent. An ISO of CentOS 7.0.1406 is available from the
-[CentOS vault](http://vault.centos.org/7.0.1406/isos/x86_64/CentOS-7.0-1406-x86_64-DVD.iso),
+The MINEX III validation package is required to be run on CentOS 7.2.1511. This
+might not be the latest version of CentOS 7, but it is being required to remain
+consistent. The OS version may be updated periodically. An ISO of CentOS
+7.2.1511 is available from
+[CentOS](http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-Everything-1511.iso)
 and is additionally
-[mirrored at NIST](http://nigos.nist.gov:8080/evaluations/CentOS-7.0-1406-x86_64-Everything.iso)
-(MD5: `39179ca247b95a4adfcc4ecee3f4605d`). The package section of the kickstart
+[mirrored at NIST](http://nigos.nist.gov:8080/evaluations/CentOS-7-x86_64-Everything-1511.iso)
+(MD5: `dba29c59117400b111633be2bf2aaf0e`). The package section of the kickstart
 file used on NIST evaluation nodes [is
 provided](http://nigos.nist.gov:8080/evaluations/minexiii/packagelist.txt) (MD5:
 `74ea0ace97c941e99d759cf39f13cff4`), though you are not required to use it.
