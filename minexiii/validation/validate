@@ -94,7 +94,7 @@ else
 fi
 
 # Confirm OS
-CENTOS_VER="CentOS Linux release 7.0.1406 (Core)"
+CENTOS_VER="CentOS Linux release 7.2.1511 (Core)"
 echo -n "Checking OS Version... "
 if [ ! -e /etc/redhat-release ]; then 
 	fail "You do not appear to be using the appropriate operating system." \
