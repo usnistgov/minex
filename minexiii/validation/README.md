@@ -9,8 +9,8 @@ provide a higher level of confidence that the results presented by NIST are a
 true measure of the submitted software.
 
 Package Contents
-
 ----------------
+
  * Interaction Required:
      * [`config/`]
        (https://github.com/usnistgov/minex/tree/master/minexiii/validation/config):
@@ -89,6 +89,10 @@ How to Run
 
 Submission Contents
 -------------------
+
+*For more general information about participation in MINEX III, please
+visit the [MINEX III participation webpage]
+(http://www.nist.gov/itl/iad/ig/minexiii_participation.cfm).*
 
 Upon successful completion of the MINEX III validation package, an archive is
 generated that must be signed and encrypted before submitting to NIST.

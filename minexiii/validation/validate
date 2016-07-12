@@ -1,13 +1,11 @@
 #!/bin/bash
 
 # URL containing the most recent version number of the validation package
-VALIDATION_VERS_URL="http://nigos.nist.gov:8080/evaluations/minexiii/validation/VERSION"
+VALIDATION_VERS_URL="https://raw.githubusercontent.com/usnistgov/minex/master/minexiii/validation/VERSION"
 # URL where information about the validation package can be found
-VALIDATION_PROMO_URL="http://www.nist.gov/itl/iad/ig/minexiii_participation.cfm"
+VALIDATION_PROMO_URL="https://github.com/usnistgov/minex/tree/master/minexiii/validation"
 # URL where the complete validation package can be downloaded
-VALIDATION_DL_URL="http://nigos.nist.gov:8080/evaluations/minexiii/validation/latest.tar.bz2"
-# URL where validation source can be found on GitHub
-GITHUB_URL="https://github.com/usnistgov/minex/tree/master/minexiii/validation"
+VALIDATION_DL_URL="https://github.com/usnistgov/minex/releases"
 
 # Directory containing validation materials
 WD=`readlink -f \`dirname $0\``
@@ -452,8 +450,6 @@ You are currently running with version $VALIDATION_VERSION.
 Information: $VALIDATION_PROMO_URL
 Version: $VALIDATION_VERS_URL
 Download: $VALIDATION_DL_URL
-
-Also available on GitHub: $GITHUB_URL
 ********************************************************************************
 "
 fi
