@@ -63,7 +63,7 @@ and is additionally
 (MD5: `dba29c59117400b111633be2bf2aaf0e`). The package section of the kickstart
 file used on NIST evaluation nodes [is
 provided](http://nigos.nist.gov:8080/evaluations/minexiii/packagelist.txt) (MD5:
-`74ea0ace97c941e99d759cf39f13cff4`), though you are not required to use it.
+`64de4cef21f37438422021c8f66c4061`), though you are not required to use it.
 However, the following packages are required to be installed:
 
 `centos-release`, `coreutils`, `curl`, `gawk`, `gcc`, `grep`, `iputils`, `make`,
