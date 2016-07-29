@@ -226,7 +226,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Check lines of template creation log
-if [ `cat "${WD}"/${OUTPUT_DIR}/${CREATE_LOG} | wc -l` -ne 768 ]; then
+if [ `cat "${WD}"/${OUTPUT_DIR}/${CREATE_LOG} | wc -l` -ne 809 ]; then
 	fail "Invalid number of lines in template creation log. Please review:"\
 	    "${WD}/${OUTPUT_DIR}/${CREATE_LOG}"
 fi
@@ -251,7 +251,7 @@ fi
 unsuccessful_rv_g=0
 OLDIFS=$IFS; IFS=$'\n';
 for line in `sed -n "2,764 p" "${WD}"/${OUTPUT_DIR}/${CREATE_LOG}`; do
-	formatTest=`echo $line | sed 's/\(.*raw\)	[0-9]\+	[0-9]\{1,3\}/test/'`
+	formatTest=`echo $line | sed 's/\(.*gray\)	[0-9]\+	[0-9]\{1,3\}/test/'`
 	if [ $? -ne 0 ] || [ "$formatTest" != "test" ]; then
 		fail "The template creation log is invalid. Please review:" \
 		    "${WD}/${OUTPUT_DIR}/${CREATE_LOG}" $line
@@ -311,7 +311,7 @@ if [ $? -eq 0 ]; then
 	echo "${MATCH_LOG_FOOTER}" >> "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}
 fi 
 # Check lines of template matching log
-if [ `cat "${WD}"/${OUTPUT_DIR}/${MATCH_LOG} | wc -l` -ne 1855 ]; then
+if [ `cat "${WD}"/${OUTPUT_DIR}/${MATCH_LOG} | wc -l` -ne 1746 ]; then
 	fail "Invalid number of lines in template matching log. Please review:"\
 	    "${WD}/${OUTPUT_DIR}/${MATCH_LOG}"
 fi
@@ -320,7 +320,7 @@ fi
 unsuccessful_rv_m=0
 uses_neg1=0
 OLDIFS=$IFS; IFS=$'\n';
-for line in `sed -n "2,1851 p" "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}`; do
+for line in `sed -n "2,1742 p" "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}`; do
 	# Check line format
 	formatTest=`echo $line | sed 's/\(.*tmpl\)	\(.*tmpl\)	\([0-9]\+\)	\(-\?[0-9]\+\.[0-9]*\|-\?[0-9]\+\)/test/'`
 	if [ $? -ne 0 ] || [ "$formatTest" != "test" ]; then
