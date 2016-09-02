@@ -90,17 +90,13 @@ blackout.center <- function(f, radius = 16)
 {
 	# Get distance of every point from center.
 	coords <- expand.grid(x = 1:ncol(f), y = 1:nrow(f))
-	midCol <- (1 + ncol(f)) / 2
-	midRow <- (1 + nrow(f)) / 2
-
-	distances <- ((coords$x - midCol) /
-	    ncol(f)*368)^2 + ((coords$y - midRow) / nrow(f)*368)^2
+	distances <- (coords$x - ncol(f) / 2)^2 + (coords$y - nrow(f) / 2)^2
 
 	# Indices of coordinates within the center radius.
 	indices <- distances <= radius^2
 
 	# Set to zero and return.
-	f[cbind(coords$y[indices], coords$x[indices])] <- 0
+	f[cbind(coords$x[indices], coords$y[indices])] <- 0
 	f
 }
 
