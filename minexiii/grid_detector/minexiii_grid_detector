@@ -99,15 +99,8 @@ display.fft <- function(density.matrix, f)
 	# Convert to log scale for visualization.
 	f <- log(1 + f)
 
-	# Mark locations of the first thr.idx maximums in the image, if they
-	# are above threshold.
-	thr.idx  <- 8
-	f.sorted <- sort(f, decreasing=TRUE)
-	f.thr	 <- f.sorted[thr.idx]
-	f.thr	 <- max(f.thr, MINEXIII.PERIODIC.THRESHOLD)
-
 	# Mark location of the absolute maximum in the image.
-	coords <- which(f >= f.thr, arr.ind = TRUE)
+	coords <- which(f == max(f), arr.ind = TRUE)
 	points(coords[,1] / nrow(f), coords[,2] / nrow(f), col="darkred",
 	    cex=2, lwd=3)
 
