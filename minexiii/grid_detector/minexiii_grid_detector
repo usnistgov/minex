@@ -21,25 +21,13 @@
 MINEXIII.PERIODIC.THRESHOLD <- 0.002
 
 # Load a minutia density file and convert to density matrix.
-get.density.matrix <- function(minutia.file, image.size = NULL)
+get.density.matrix <- function(minutia.file, image.size)
 {
 	# Read in as data frame.
 	minutia.data <- read.table(minutia.file, header = TRUE, sep = ",")
 
 	# Convert to density matrix.
-	if (is.null(image.size)) {
-		min.X <- min(minutia.data$x) + 1
-		min.Y <- min(minutia.data$y) + 1
-		max.X <- max(minutia.data$x) + 1
-		max.Y <- max(minutia.data$y) + 1
-
-		minutia.density <- matrix(0, nrow = max.X + min.X,
-		    ncol = max.Y + min.Y)
-	} else {
-		minutia.density <- matrix(0, nrow = image.size,
-		    ncol = image.size)
-	}
-
+	minutia.density <- matrix(0, nrow = image.size, ncol = image.size)
 	minutia.density[cbind(minutia.data$x + 1, minutia.data$y + 1)] <-
 	    minutia.data$count
 
