@@ -165,6 +165,8 @@ perform.grid.test <- function(density.path, image.size = NULL,
 		# TXT or CSV file.
 		if (extension == "txt" || extension == "csv") {
 			cat(sprintf("          File: %s\n", density.path))
+			if (is.null(image.size))
+				stop(args.error);
 
 			density.matrix <- get.density.matrix(density.path,
 			    image.size = image.size)
