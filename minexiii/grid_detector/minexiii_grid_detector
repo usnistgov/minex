@@ -182,6 +182,7 @@ perform.grid.test <- function(density.path, image.size = NULL,
 		}
 	}
 
+	stopifnot(exists("density.matrix"))
 	density.matrix <- apply.windowing(density.matrix)
 
 	# Convert to FFT.
