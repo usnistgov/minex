@@ -164,7 +164,6 @@ perform.grid.test <- function(density.path, image.size = NULL,
 
 		# TXT or CSV file.
 		if (extension == "txt" || extension == "csv") {
-			cat(sprintf("          File: %s\n", density.path))
 			if (is.null(image.size))
 				stop(args.error);
 
@@ -173,8 +172,6 @@ perform.grid.test <- function(density.path, image.size = NULL,
 			min.count      <- sum(density.matrix)
 		# PNG file.
 		} else if (extension == "png") {
-			cat(sprintf("           File: %s\n", density.path))
-
 			img <- png::readPNG(density.path)
 
 			# If PNG file is RGB (if all gray, shouldn't matter
@@ -184,7 +181,7 @@ perform.grid.test <- function(density.path, image.size = NULL,
 
 			density.matrix <- t(img)
 		} else {
-			stop("Cannot read file format.")
+			stop(args.error)
 		}
 	}
 
@@ -198,8 +195,9 @@ perform.grid.test <- function(density.path, image.size = NULL,
 	max.modulation <- max(f)
 	decision <- (max.modulation >= MINEXIII.PERIODIC.THRESHOLD)
 
-	cat(sprintf("        Pattern: %s\n", decision))
-	cat(sprintf("          Score: %.5f\n", round(max.modulation, 5)))
+	cat(sprintf("   File: %s\n", density.path))
+	cat(sprintf("Pattern: %s\n", decision))
+	cat(sprintf("  Score: %.5f\n", round(max.modulation, 5)))
 
 # 	if (!is.null(min.count)) {
 # 		norm.factor <- max.gauss.element.norm.factor(prod(
