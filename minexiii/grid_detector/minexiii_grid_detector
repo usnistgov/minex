@@ -172,14 +172,11 @@ perform.grid.test <- function(density.path, image.size = NULL,
 			min.count      <- sum(density.matrix)
 		# PNG file.
 		} else if (extension == "png") {
-			img <- png::readPNG(density.path)
-
-			# If PNG file is RGB (if all gray, shouldn't matter
-			# which channel we pick).
-			if (length(dim(img))==3)
-				img <- img[,,1]
-
-			density.matrix <- t(img)
+			# Load PNG, converting pixels to a density matrix.
+			# NOTE: This is an approximation, since values are
+			#       scaled [0, 255].
+			density.matrix <- round(255 *
+			    t(png::readPNG(density.path)))
 		} else {
 			stop(args.error)
 		}
