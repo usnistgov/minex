@@ -49,40 +49,24 @@ apply.windowing <- function(density.matrix)
 	density.matrix * weights
 }
 
-get.flip.indexes <- function(N)
-{
-	if (N %% 2 == 0) {
-		halfN <- N / 2
-		rez <- c(halfN + (1:halfN), 1:(halfN + 1))
-	} else {
-		floorHalfN <- floor(N / 2)
-		ceilingHalfN <- ceiling(N / 2)
-		rez <- c(ceilingHalfN + 1:floorHalfN, 1:ceilingHalfN)
-	}
-
-	rez
-}
-
 # Convert minutia density plot to fourier representation.
 load.fft <- function(minutia.density)
 {
-	image.nrow <- nrow(minutia.density)
-	image.ncol <- ncol(minutia.density)
+	image.size <- nrow(minutia.density)
 
 	# Compute Fourier transform.
 	f <- fft(minutia.density)
 
 	# Take magnitude of complex number at each point.
 	f <- abs(f)
-	fDiv <- f[1,1]
+
+	# Divide by average intensity over image.
+	f <- f / f[1,1]
 
 	# Flip quadrants I and III, and II and IV.
-	idx <- get.flip.indexes(image.ncol)
-	f <- f[,idx]
-	idx <- get.flip.indexes(image.nrow)
-	f <- f[idx,]  # matrix becomes symmetric with respect to center
-
-	f / fDiv
+	f <- f[,(1:image.size - image.size / 2) %% image.size]
+	f <- f[ (1:image.size - image.size / 2) %% image.size,]
+	f
 }
 
 # Black out center area of FFT (low-frequency area).
