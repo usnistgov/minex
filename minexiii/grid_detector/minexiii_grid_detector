@@ -239,5 +239,5 @@ if (length(args) >= 2)
 decision <- perform.grid.test(args[1], image.size = image.size)
 
 # Set return status
-quit(status = decision)
+quit(status = as.numeric(decision))
 
