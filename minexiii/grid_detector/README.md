@@ -31,12 +31,13 @@ maximum modulation is greater than or equal to **0.002**. This value was
 selected empirically so that decisions agree with *most* manual inspection
 results.
 
-For [MINEX III](http://www.nist.gov/itl/iad/ig/minexiii.cfm), this tool is a
-first pass at detecting periodic structure. A test administrator may still
-override the tool's decision if the minutia density plot features other
-structure judged to be non-compliant with ANSI/INCITS 378-2004, clause 5. While
-it depends on an empirical threshold, we consider this method superior to the
-old procedure of human inspection.
+For [MINEX III]
+(https://www.nist.gov/itl/iad/image-group/minutiae-interoperability-exchange-minex-iii),
+this tool is a first pass at detecting periodic structure. A test administrator
+may still override the tool's decision if the minutia density plot features
+other structure judged to be non-compliant with ANSI/INCITS 378-2004, clause 5.
+While it depends on an empirical threshold, we consider this method superior to
+the old procedure of human inspection.
 
 Requirements
 ------------

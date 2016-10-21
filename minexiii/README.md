@@ -2,7 +2,7 @@ MINEX III
 =========
 
 [Minutia Interoperability Exchange (MINEX) III]
-(http://www.nist.gov/itl/iad/ig/minexiii.cfm)
+(https://www.nist.gov/itl/iad/image-group/minutiae-interoperability-exchange-minex-iii)
 is an ongoing test of ANSI/INCITS 378-2004 fingerprint templates, as established
 in Annex A of [NIST SP 800-76-2]
 (http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-76-2.pdf).

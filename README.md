@@ -2,11 +2,11 @@ Minutia Interoperability Exchange
 =================================
 
 [Minutia Interoperability Exchange (MINEX)]
-(http://www.nist.gov/itl/iad/ig/minex.cfm) is a suite of tests created by the
-National Institute of Standards and Technology that exercise interoperable
-fingerprint templates. This repository contains code and examples
-that may be useful to participants of MINEX tests and those interested in
-interoperable fingerprint templates.
+(https://www.nist.gov/programs-projects/minutiae-interoperability-exchange-minex-overview)
+is a suite of tests created by the National Institute of Standards and
+Technology that exercise interoperable fingerprint templates. This repository
+contains code and examples that may be useful to participants of MINEX tests
+and those interested in interoperable fingerprint templates.
 
 Tests
 -----

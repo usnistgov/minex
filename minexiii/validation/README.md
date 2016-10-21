@@ -43,8 +43,9 @@ Package Contents
        Header containing metadata for the imagery in `validation_imagery_raw`.
      * [`validation_imagery_raw/`]
        (https://github.com/usnistgov/minex/tree/master/minexiii/validation/validation_imagery_raw):
-       Directory containing raw images files, which are stills from
-       [NIST SD-24](http://www.nist.gov/srd/nistsd24.cfm).
+       Directory containing raw images files, which are cropped and rotated
+       images from [NIST SD-29](https://www.nist.gov/srd/nist-special-database-29)
+       slap images.
      * [`VERSION`]
        (https://github.com/usnistgov/minex/blob/master/minexiii/validation/VERSION):
        Version number of the validation package.
@@ -93,7 +94,7 @@ Submission Contents
 
 *For more general information about participation in MINEX III, please
 visit the [MINEX III participation webpage]
-(http://www.nist.gov/itl/iad/ig/minexiii_participation.cfm).*
+(https://www.nist.gov/itl/iad/image-group/participation-minex-iii).*
 
 Upon successful completion of the MINEX III validation package, an archive is
 generated that must be signed and encrypted before submitting to NIST.
