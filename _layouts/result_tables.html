@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% include head.html %}
+<link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/static/css/datatables.min.css" />
+<script type="text/javascript" src="{{ site.baseurl }}/static/js/datatables.min.js"></script>
+<script type="text/javascript" src="{{ site.baseurl }}/static/js/results.min.js"></script>
+</head>
+<body>
+{% include header.html %}
+{{ content }}
+{% include results/minexiii.html %}
+<hr>
+{% include results/ominex.html %}
+<hr>
+{% include results/minexiii_compliance.html %}
+{% include footer.html %}
+</body>
+</html>

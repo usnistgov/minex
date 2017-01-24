@@ -1,0 +1,6 @@
+.dt-button-collection { width:auto !important; }
+.minex_yes { color:green; }
+.minex_no { color:red; }
+.minex_na { color:orange; }
+.dt-buttons, .dataTables_filter, .dataTables_info, h4 { margin-left: 10px; margin-right: 10px; }
+h2, h3 { text-align: center; }
