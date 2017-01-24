@@ -23,17 +23,14 @@
   color: #EEE;
   text-decoration: none;
 }
-.nist-header h1 {
+.nist-logo {
   margin: 0 10px 0 0;
   float: left;
   font-size: 0;
-}
-.nist-header h1 a {
   font-weight: normal;
-  font-size: 20px;
   height: 40px;
   width: 280px;
-  background: url('nist_logo.png') no-repeat;
+  background: url('nist_logo.svg') no-repeat;
   background-size: 280px auto;
   text-indent: -9999px;
   overflow: hidden;
@@ -65,10 +62,10 @@ a.nist-links-button {
   .nist-header {
     padding: 6px 10px;
   }
-  .nist-header h1 a {
+  .nist-logo {
     height: 26px;
     width: 80px;
-    background: url('nist_logo_mark.png') 0 4px no-repeat;
+    background: url('nist_logo_mark.svg') 0 4px no-repeat;
     background-size: 80px auto;
   }
   .mobile-hide {
