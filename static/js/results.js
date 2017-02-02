@@ -2,12 +2,17 @@
  * MINEX III table.
  */
 $(document).ready(function() {
+	$.fn.dataTable.moment('MM/DD/YYYY');
 	var minexiii_dt = $('#minexiii_results').DataTable({
 		"paging":false,
 		"columnDefs": [
 			{
 			"targets": [5,6,7,8],
 			"visible": false,
+			},
+			{
+			"targets": 3,
+			"render": $.fn.dataTable.render.moment('MM/DD/YYYY', 'DD MMM YYYY')
 			}
 		],
 		colReorder: {
@@ -43,12 +48,17 @@ $(document).ready(function() {
  * Ongoing MINEX table.
  */
 $(document).ready(function() {
+	$.fn.dataTable.moment('MM/DD/YYYY');
 	var ominex_dt = $('#ominex_results').DataTable({
 		"paging":false,
 		"columnDefs": [
 			{
 			"targets": [4,5,6],
 			"visible": false,
+			},
+			{
+			"targets": 3,
+			"render": $.fn.dataTable.render.moment('MM/DD/YYYY', 'DD MMM YYYY')
 			}
 		],
 		colReorder: {
