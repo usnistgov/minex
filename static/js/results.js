@@ -21,6 +21,7 @@ $(document).ready(function() {
 		scrollY: "300px",
 		scrollCollapse: true,
 		buttons: ['colvis', 'csvHtml5'],
+		order: [[3, 'desc']],
 
 		// Dynamic responsive columns. Must also set table class to dt-responsive.
 		dom: 'Bfrtip',
@@ -67,6 +68,7 @@ $(document).ready(function() {
 		scrollY: "300px",
 		scrollCollapse: true,
 		buttons: ['colvis', 'csvHtml5'],
+		order: [[3, 'desc']],
 
 		// Dynamic responsive columns. Must also set table class to dt-responsive.
 		dom: 'Bfrtip',
