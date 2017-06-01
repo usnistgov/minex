@@ -8,46 +8,50 @@ submitting to NIST. This helps reduce the overall runtime of the evaluation and
 provide a higher level of confidence that the results presented by NIST are a
 true measure of the submitted software.
 
+*For more general information about participation in MINEX III, please
+visit the [MINEX III participation webpage](
+https://www.nist.gov/itl/iad/image-group/participation-minex-iii).*
+
 Package Contents
 ----------------
 
  * Interaction Required:
-     * [`config/`]
-       (https://github.com/usnistgov/minex/tree/master/minexiii/validation/config):
+     * [`config/`](
+       https://github.com/usnistgov/minex/tree/master/minexiii/validation/config):
        Directory where all required configuration files must be placed. You
        might not have any configuration files.
-     * [`lib/`]
-       (https://github.com/usnistgov/minex/tree/master/minexiii/validation/lib):
+     * [`lib/`](
+       https://github.com/usnistgov/minex/tree/master/minexiii/validation/lib):
        Directory where all required libraries must be placed. There must
        be at least one "core" library, and that library **must** follow the
        MINEX III naming convention.
-     * [`validate`]
-       (https://github.com/usnistgov/minex/blob/master/minexiii/validation/validate):
+     * [`validate`](
+       https://github.com/usnistgov/minex/blob/master/minexiii/validation/validate):
        Script to automate running the validation driver and perform sanity
        checks on the output.
  * Supporting Files:
-     * [`Makefile`]
-       (https://github.com/usnistgov/minex/blob/master/minexiii/validation/Makefile):
+     * [`Makefile`](
+       https://github.com/usnistgov/minex/blob/master/minexiii/validation/Makefile):
      Builds the validation source code files.
-     * [`minexiii.h`]
-       (https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii.h):
+     * [`minexiii.h`](
+       https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii.h):
      API specification for MINEX III.
-     * [`minexiii_validation.cpp`]
-       (https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii_validation.cpp):
+     * [`minexiii_validation.cpp`](
+       https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii_validation.cpp):
      C++ source code for the validation driver.
-     * [`minexiii_validation.h`]
-       (https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii_validation.h):
+     * [`minexiii_validation.h`](
+       https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii_validation.h):
      C++ header  for the validation driver.
-     * [`minexiii_validation_data.h`]
-       (https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii_validation_data.h):
+     * [`minexiii_validation_data.h`](
+       https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii_validation_data.h):
        Header containing metadata for the imagery in `validation_imagery_raw`.
-     * [`validation_imagery_raw/`]
-       (https://github.com/usnistgov/minex/tree/master/minexiii/validation/validation_imagery_raw):
+     * [`validation_imagery_raw/`](
+       https://github.com/usnistgov/minex/tree/master/minexiii/validation/validation_imagery_raw):
        Directory containing raw images files, which are cropped and rotated
        images from [NIST SD-29](https://www.nist.gov/srd/nist-special-database-29)
        slap images.
-     * [`VERSION`]
-       (https://github.com/usnistgov/minex/blob/master/minexiii/validation/VERSION):
+     * [`VERSION`](
+       https://github.com/usnistgov/minex/blob/master/minexiii/validation/VERSION):
        Version number of the validation package.
 
 
@@ -64,7 +68,7 @@ and is additionally
 (MD5: `dba29c59117400b111633be2bf2aaf0e`). The package section of the kickstart
 file used on NIST evaluation nodes [is
 provided](http://nigos.nist.gov:8080/evaluations/minexiii/packagelist.txt) (MD5:
-`64de4cef21f37438422021c8f66c4061`), though you are not required to use it.
+`cfb08951f13a8ba2a168b85fc6754503`), though you are not required to use it.
 However, the following packages are required to be installed:
 
 `centos-release`, `coreutils`, `curl`, `gawk`, `gcc`, `grep`, `iputils`, `make`,
@@ -91,10 +95,6 @@ How to Run
 
 Submission Contents
 -------------------
-
-*For more general information about participation in MINEX III, please
-visit the [MINEX III participation webpage]
-(https://www.nist.gov/itl/iad/image-group/participation-minex-iii).*
 
 Upon successful completion of the MINEX III validation package, an archive is
 generated that must be signed and encrypted before submitting to NIST.

@@ -1,8 +1,8 @@
 Minutia Interoperability Exchange
 =================================
 
-[Minutia Interoperability Exchange (MINEX)]
-(https://www.nist.gov/programs-projects/minutiae-interoperability-exchange-minex-overview)
+[Minutia Interoperability Exchange (MINEX)](
+https://www.nist.gov/programs-projects/minutiae-interoperability-exchange-minex-overview)
 is a suite of tests created by the National Institute of Standards and
 Technology that exercise interoperable fingerprint templates. This repository
 contains code and examples that may be useful to participants of MINEX tests
@@ -13,8 +13,8 @@ Tests
 
  * [MINEX III](https://github.com/usnistgov/minex/tree/master/minexiii)
  	* An ongoing test of ANSI/INCITS 378-2004 fingerprint templates,
- 	  as specified in [NIST SP 800-76-2]
- 	  (http://dx.doi.org/10.6028/NIST.SP.800-76-2).
+ 	  as specified in [NIST SP 800-76-2](
+ 	  http://dx.doi.org/10.6028/NIST.SP.800-76-2).
 
 Communication
 -------------
@@ -25,8 +25,8 @@ have a feature request, please
 questions may be addressed to the [NIST MINEX team](mailto:minex@nist.gov).
 
 The MINEX team sends updates about the MINEX tests to their mailing list. To
-join the list, send a blank e-mail to [MINEX-Announce-JOIN@nist.gov]
-(mailto:MINEX-Announce-JOIN@nist.gov) and you will be automatically subscribed.
+join the list, send a blank e-mail to [MINEX-Announce-JOIN@nist.gov](
+mailto:MINEX-Announce-JOIN@nist.gov) and you will be automatically subscribed.
 
 License
 -------
