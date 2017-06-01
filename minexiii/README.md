@@ -1,11 +1,10 @@
 MINEX III
 =========
 
-[Minutia Interoperability Exchange (MINEX) III]
-(https://www.nist.gov/itl/iad/image-group/minutiae-interoperability-exchange-minex-iii)
+[Minutia Interoperability Exchange (MINEX) III](
+https://www.nist.gov/itl/iad/image-group/minutiae-interoperability-exchange-minex-iii)
 is an ongoing test of ANSI/INCITS 378-2004 fingerprint templates, as established
-in Annex A of [NIST SP 800-76-2]
-(http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-76-2.pdf).
+in Annex A of [NIST SP 800-76-2](http://dx.doi.org/10.6028/NIST.SP.800-76-2).
 The test is used to establish compliant of template generators and template
 matchers for the U.S. Government's Personal Identity Verification (PIV)
 program. This repository contains a collection of utilities that may help MINEX
@@ -14,12 +13,12 @@ III participants prepare and debug their submissions.
 Contents
 --------
 
- * [Grid Detector]
-   (https://github.com/usnistgov/minex/tree/master/minexiii/grid_detector)
+ * [Grid Detector](
+   https://github.com/usnistgov/minex/tree/master/minexiii/grid_detector)
  	* A tool for detecting high frequency periodic structures in minutia
  	  placement density functions.
- * [Validation]
-   (https://github.com/usnistgov/minex/tree/master/minexiii/validation)
+ * [Validation](
+   https://github.com/usnistgov/minex/tree/master/minexiii/validation)
  	* Package used to verify and submit MINEX III libraries for testing
  	  at NIST.
 
@@ -32,11 +31,11 @@ have a feature request, please
 questions may be addressed to the [NIST MINEX team](mailto:minex@nist.gov).
 
 The MINEX team sends updates about the MINEX tests to their mailing list. To
-join the list, send a blank e-mail to [MINEX-Announce-JOIN@nist.gov]
-(mailto:MINEX-Announce-JOIN@nist.gov) and you will be automatically subscribed.
+join the list, send a blank e-mail to [MINEX-Announce-JOIN@nist.gov](
+mailto:MINEX-Announce-JOIN@nist.gov) and you will be automatically subscribed.
 
-The MINEX III test hosts an [RSS feed]
-(http://nigos.nist.gov:8080/evaluations/minexiii/rss.xml) of updates.
+The MINEX III test hosts an [RSS feed](
+http://nigos.nist.gov:8080/evaluations/minexiii/rss.xml) of updates.
 
 License
 -------
