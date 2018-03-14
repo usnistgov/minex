@@ -107,8 +107,8 @@ contain paths that can be edited are **bolded** below.
 
  * `cbeff.log`: The output of running `time minexiii_validation pid` and the
    contents of the following environment variables:
-       * `MINEXIII_GENERATOR_MARKETING_NAME`
-       * `MINEXIII_MATCHER_MARKETING_NAME`
+	* `MINEXIII_GENERATOR_MARKETING_NAME`
+	* `MINEXIII_MATCHER_MARKETING_NAME`
  * **`compile.log`**: The output of running `time make`, the MD5 checksum of the
    contents of `lib` and `config`, the output of `ldd` on `minexiii_validation`,
    and the current version of the operating system.
@@ -153,6 +153,7 @@ you for submittal but NIST would later reject you:
  * Templates generated are not compliant with ANSI/INCITS 378-2004
    specifications.
  * Templates generated are not compatible for MINEX III black box testing.
+ * Library contains symbol names duplicated from NIST code.
 
 Communication
 -------------
