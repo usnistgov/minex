@@ -24,9 +24,13 @@ have a feature request, please
 [open an issue](https://github.com/usnistgov/minex/issues). Other
 questions may be addressed to the [NIST MINEX team](mailto:minex@nist.gov).
 
-The MINEX team sends updates about the MINEX tests to their mailing list. To
-join the list, send a blank e-mail to [MINEX-Announce-JOIN@nist.gov](
-mailto:MINEX-Announce-JOIN@nist.gov) and you will be automatically subscribed.
+The MINEX team sends updates about the MINEX tests to their mailing list.
+Enter your e-mail address on the
+[list page](https://groups.google.com/a/list.nist.gov/forum/#!forum/minex/join),
+or send a blank e-mail to
+[MINEX+subscribe@list.nist.gov](mailto:MINEX+subscribe@list.nist.gov) to be
+automatically subscribed. Posts to the list are mirrored on an
+[RSS feed](https://groups.google.com/a/list.nist.gov/forum/feed/minex/msgs/rss.xml).
 
 License
 -------

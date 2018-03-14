@@ -61,15 +61,11 @@ Requirements
 The MINEX III validation package is required to be run on CentOS 7.2.1511. This
 might not be the latest version of CentOS 7, but it is being required to remain
 consistent. The OS version may be updated periodically. An ISO of CentOS
-7.2.1511 is available from
-[CentOS](http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-Everything-1511.iso)
-and is additionally
-[mirrored at NIST](http://nigos.nist.gov:8080/evaluations/CentOS-7-x86_64-Everything-1511.iso)
-(MD5: `dba29c59117400b111633be2bf2aaf0e`). The package section of the kickstart
-file used on NIST evaluation nodes [is
-provided](http://nigos.nist.gov:8080/evaluations/minexiii/packagelist.txt) (MD5:
-`cfb08951f13a8ba2a168b85fc6754503`), though you are not required to use it.
-However, the following packages are required to be installed:
+7.2.1511 is freely available as a direct download from the
+[CentOS vault](http://vault.centos.org)
+([USA](http://archive.kernel.org/centos-vault/7.2.1511/isos/x86_64/CentOS-7-x86_64-Everything-1511.iso),
+[Europe](http://mirror.nsc.liu.se/centos-store/7.2.1511/isos/x86_64/CentOS-7-x86_64-Everything-1511.iso)).
+The following packages are required to be installed:
 
 `centos-release`, `coreutils`, `curl`, `gawk`, `gcc`, `grep`, `iputils`, `make`,
 `sed`, `which`, `yum`

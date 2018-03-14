@@ -59,7 +59,8 @@ Example
 -------
 
 *Example minutia density images can be found on the [MINEX III
-results webpage](http://nigos.nist.gov:8080/evaluations/minexiii/density).*
+results repository](
+https://github.com/usnistgov/minex/tree/nist-pages/results/density).*
 
     $ minexiii_grid_detector minutia_density.csv 368
        File: minutia_density.csv
