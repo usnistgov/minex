@@ -7,7 +7,7 @@ $(document).ready(function() {
 		"paging":false,
 		"columnDefs": [
 			{
-			"targets": [5,6,8,9,10,11,12,13,14,15,16,17],
+			"targets": [5,6,8,9,10,11,12,13,14,15,16,17,18],
 			"visible": false,
 			},
 			{
@@ -54,7 +54,7 @@ $(document).ready(function() {
 		"paging":false,
 		"columnDefs": [
 			{
-			"targets": [4,6,7,8,9,10,11,12,13,14,15],
+			"targets": [4,6,7,8,9,10,11,12,13,14,15,16],
 			"visible": false,
 			},
 			{
