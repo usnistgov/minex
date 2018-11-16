@@ -7,7 +7,7 @@ $(document).ready(function() {
 		"paging":false,
 		"columnDefs": [
 			{
-			"targets": [5,6,8,9,10,11,12,13,14,15,16,17,18],
+			"targets": [5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21],
 			"visible": false,
 			},
 			{
