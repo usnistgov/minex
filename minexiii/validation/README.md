@@ -49,7 +49,7 @@ The MINEX III validation package is required to be run on CentOS 7.6.1810. This
 is not the latest version of CentOS 7, but it is being required to remain
 consistent. The OS version may be updated periodically. An ISO of CentOS
 7.6.1511 is freely available as a direct download from the [CentOS vault]
-([🇺🇸 USA], [🇪🇺 Europe]) or the [NIST mirrow]). The following packages are
+([🇺🇸 USA], [🇪🇺 Europe]) or the [NIST mirror]. The following packages are
 required to be installed:
 
 `centos-release`, `coreutils`, `curl`, `gawk`, `gcc-c++`, `grep`, `iputils`,
