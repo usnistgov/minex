@@ -9,66 +9,51 @@ provide a higher level of confidence that the results presented by NIST are a
 true measure of the submitted software.
 
 *For more general information about participation in MINEX III, please
-visit the [MINEX III participation webpage](
-https://www.nist.gov/itl/iad/image-group/participation-minex-iii).*
+visit the [MINEX III participation webpage].*
 
 Package Contents
 ----------------
 
  * Interaction Required:
-     * [`config/`](
-       https://github.com/usnistgov/minex/tree/master/minexiii/validation/config):
+     * [`config/`]:
        Directory where all required configuration files must be placed. You
        might not have any configuration files.
-     * [`lib/`](
-       https://github.com/usnistgov/minex/tree/master/minexiii/validation/lib):
+     * [`lib/`]:
        Directory where all required libraries must be placed. There must
        be at least one "core" library, and that library **must** follow the
        MINEX III naming convention.
-     * [`validate`](
-       https://github.com/usnistgov/minex/blob/master/minexiii/validation/validate):
+     * [`validate`]:
        Script to automate running the validation driver and perform sanity
        checks on the output.
  * Supporting Files:
-     * [`Makefile`](
-       https://github.com/usnistgov/minex/blob/master/minexiii/validation/Makefile):
+     * [`Makefile`]:
      Builds the validation source code files.
-     * [`minexiii.h`](
-       https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii.h):
+     * [`minexiii.h`]:
      API specification for MINEX III.
-     * [`minexiii_validation.cpp`](
-       https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii_validation.cpp):
+     * [`minexiii_validation.cpp`]:
      C++ source code for the validation driver.
-     * [`minexiii_validation.h`](
-       https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii_validation.h):
+     * [`minexiii_validation.h`]:
      C++ header  for the validation driver.
-     * [`minexiii_validation_data.h`](
-       https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii_validation_data.h):
+     * [`minexiii_validation_data.h`]:
        Header containing metadata for the imagery in `validation_imagery_raw`.
-     * [`validation_imagery_raw/`](
-       https://github.com/usnistgov/minex/tree/master/minexiii/validation/validation_imagery_raw):
-       Directory containing raw images files, which are cropped and rotated
-       images from [NIST SD-29](https://www.nist.gov/srd/nist-special-database-29)
-       slap images.
-     * [`VERSION`](
-       https://github.com/usnistgov/minex/blob/master/minexiii/validation/VERSION):
+     * `validation_imagery_raw/`:
+       Directory where decompressed validation fingerprint imagery resides.
+     * [`VERSION`]:
        Version number of the validation package.
 
 
 Requirements
 ------------
 
-The MINEX III validation package is required to be run on CentOS 7.2.1511. This
-might not be the latest version of CentOS 7, but it is being required to remain
+The MINEX III validation package is required to be run on CentOS 7.6.1810. This
+is not the latest version of CentOS 7, but it is being required to remain
 consistent. The OS version may be updated periodically. An ISO of CentOS
-7.2.1511 is freely available as a direct download from the
-[CentOS vault](http://vault.centos.org)
-([USA](http://archive.kernel.org/centos-vault/7.2.1511/isos/x86_64/CentOS-7-x86_64-Everything-1511.iso),
-[Europe](http://mirror.nsc.liu.se/centos-store/7.2.1511/isos/x86_64/CentOS-7-x86_64-Everything-1511.iso)).
-The following packages are required to be installed:
+7.6.1511 is freely available as a direct download from the [CentOS vault]
+([🇺🇸 USA], [🇪🇺 Europe]) or the [NIST mirrow]). The following packages are
+required to be installed:
 
-`centos-release`, `coreutils`, `curl`, `gawk`, `gcc`, `grep`, `iputils`, `make`,
-`sed`, `which`, `yum`
+`centos-release`, `coreutils`, `curl`, `gawk`, `gcc-c++`, `grep`, `iputils`,
+`make`, `sed`, `which`, `yum`
 
 It is highly suggested that you ensure your submission will build and run as
 expected on environments as close as possible to the NIST evaluation machines,
@@ -79,15 +64,17 @@ How to Run
 
  1. Place your MINEX III software libraries in the `lib` directory.
  2. Place any configuration files in the `config` directory.
- 3. Export the software/marketing name of the algorithms under test in
-    the following environment variables (optional):
-	* `MINEXIII_GENERATOR_MARKETING_NAME`
-	* `MINEXIII_MATCHER_MARKETING_NAME`
+ 3. (*Optional*) Export the software/marketing name of the algorithms under test
+    in the following environment variables. For example:
+	* `export MINEXIII_GENERATOR_MARKETING_NAME="mindtct 2.3"`
+	* `export MINEXIII_MATCHER_MARKETING_NAME="bozorth3 5.0.1"`
+ 4. Export the environment variable `MINEXIII_GENERATOR_ONLY` to `TRUE` if your
+    submission does not contain a template matcher:
+    - `export MINEXIII_GENERATOR_ONLY=TRUE`
  4. Execute `./validate`
  5. If successful, sign *and* encrypt the resulting output archive, and e-mail
-    it, along with the encrypting identity's public key, to
-    [minex@nist.gov](mailto:minex@nist.gov). If unsuccessful, correct any errors
-    detailed in the script output and try again.
+    it, along with the encrypting identity's public key, to minex@nist.gov. If
+    unsuccessful, correct any errors detailed in the script output and try again.
 
 Submission Contents
 -------------------
@@ -159,13 +146,35 @@ Communication
 -------------
 
 If you found a bug and can provide steps to reliably reproduce it, or if you
-have a feature request, please
-[open an issue](https://github.com/usnistgov/minex/issues). Other
-questions may be addressed to the [NIST MINEX team](mailto:minex@nist.gov).
+have a feature request, please [open an issue]. Other questions may be addressed
+to the [NIST MINEX team].
 
 License
 -------
 
 The items in this repository are released in the public domain. See the
-[LICENSE](https://github.com/usnistgov/minex/blob/master/LICENSE.md)
-for details.
+[LICENSE] for details.
+
+[MINEX III participation webpage]: https://www.nist.gov/itl/iad/image-group/participation-minex-iii
+
+[`config/`]: https://github.com/usnistgov/minex/tree/master/minexiii/validation/config
+[`lib/`]: https://github.com/usnistgov/minex/tree/master/minexiii/validation/lib
+[`validate`]: https://github.com/usnistgov/minex/blob/master/minexiii/validation/validate
+[`Makefile`]: https://github.com/usnistgov/minex/blob/master/minexiii/validation/Makefile
+[`minexiii.h`]: https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii.h
+[`minexiii_validation.cpp`]: https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii_validation.cpp
+[`minexiii_validation.h`]: https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii_validation.h
+[`minexiii_validation_data.h`]: https://github.com/usnistgov/minex/blob/master/minexiii/validation/minexiii_validation_data.h
+[`VERSION`]: https://github.com/usnistgov/minex/blob/master/minexiii/validation/VERSION
+
+[Request the validation imagery]:  https://www.nist.gov/itl/iad/image-group/participation-minex-iii
+
+[CentOS vault]: http://vault.centos.org
+[🇺🇸 USA]: http://mirror.umd.edu/centos/7.6.1810/isos/x86_64/CentOS-7-x86_64-Everything-1810.iso
+[🇪🇺 Europe]: http://centos.mirrors.proxad.net/7.6.1810/isos/x86_64/CentOS-7-x86_64-Everything-1810.iso
+[NIST mirror]: http://nigos.nist.gov:8080/evaluations/CentOS-7-x86_64-Everything-1810.iso
+
+[open an issue]: https://github.com/usnistgov/minex/issues
+[NIST MINEX team]: mailto:minex@nist.gov
+
+[LICENSE]: https://github.com/usnistgov/minex/blob/master/LICENSE.md

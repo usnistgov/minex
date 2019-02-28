@@ -30,8 +30,7 @@ MINEX_LIB_DIR=lib
 # Name of directory where participant should place all libraries
 MINEX_CONFIG_DIR=config
 # Packages required to run this script
-REQUIRED_PKGS="binutils centos-release coreutils curl file gawk gcc grep iputils make sed which yum"
-
+REQUIRED_PKGS="binutils centos-release coreutils curl file gawk gcc-c++ grep iputils make sed which yum"
 # Make failing return codes persist across pipes
 set -o pipefail
 # Set dynamic library path to location of participant library
@@ -47,7 +46,7 @@ fail()
 		echo "********************************************************************************"
 		IFS=,
 		for i in $*; do
-			echo $i
+			echo $i | fmt
 		done
 	fi
 	echo "********************************************************************************"
@@ -56,6 +55,30 @@ fail()
 }
 
 date
+
+# Warn about missing marketing name information
+if [ "${MINEXIII_GENERATOR_MARKETING_NAME}" == "" ]; then
+	echo "*** [NOTE] You have not provided a marketing name for your template generator."
+	echo "           If you wanted to do so, be sure to set the environment variable"
+	echo "           'MINEXIII_GENERATOR_MARKETING_NAME' before running so this"
+	echo "           information can be recorded."
+fi
+if [ "${MINEXIII_MATCHER_MARKETING_NAME}" == "" ]; then
+	echo "*** [NOTE] You have not provided a marketing name for your template matcher."
+	echo "           If you wanted to do so, be sure to set the environment variable"
+	echo "           'MINEXIII_MATCHER_MARKETING_NAME' before running so this"
+	echo "           information can be recorded."
+fi
+
+# Generator-only submission?
+echo -n "Checking for generator-only designation... "
+if [ "${MINEXIII_GENERATOR_ONLY^^}" == "TRUE" ] || [ "${MINEXIII_GENERATOR_ONLY,,}" == "YES" ] || [ "${MINEXIII_GENERATOR_ONLY}" == "1" ]; then
+	echo "(yes: generator only) [DONE]"
+	MINEXIII_GENERATOR_ONLY=TRUE
+else
+	echo "(no: generator and matcher) [DONE]"
+	MINEXIII_GENERATOR_ONLY=FALSE
+fi
 
 # Check for required packages
 echo -n "Checking for required packages... "
@@ -94,9 +117,9 @@ else
 fi
 
 # Confirm OS
-CENTOS_VER="CentOS Linux release 7.2.1511 (Core)"
+CENTOS_VER="CentOS Linux release 7.6.1810 (Core)"
 echo -n "Checking OS Version... "
-if [ ! -e /etc/redhat-release ]; then 
+if [ ! -e /etc/redhat-release ]; then
 	fail "You do not appear to be using the appropriate operating system." \
 	    "Please use $CENTOS_VER."
 fi
@@ -200,7 +223,7 @@ echo "[OKAY]"
 # Check library version number
 echo -n "Gathering CBEFF info... "
 cd "${WD}" && { time "${WD}"/${BINARY} pid; } 2>&1 | \
-    tee "${WD}"/${OUTPUT_DIR}/${CBEFF_LOG} > /dev/null 
+    tee "${WD}"/${OUTPUT_DIR}/${CBEFF_LOG} > /dev/null
 if [ $? -ne 0 ]; then
 	fail 'An error occurred while gathering CBEFF info. Please review:' \
 	    "${WD}/${OUTPUT_DIR}/${CBEFF_LOG}"
@@ -215,11 +238,12 @@ fi
 # Save marketing name information
 echo "MINEXIII_GENERATOR_MARKETING_NAME='${MINEXIII_GENERATOR_MARKETING_NAME}'" >> "${WD}"/${OUTPUT_DIR}/${CBEFF_LOG}
 echo "MINEXIII_MATCHER_MARKETING_NAME='${MINEXIII_MATCHER_MARKETING_NAME}'" >> "${WD}"/${OUTPUT_DIR}/${CBEFF_LOG}
+echo "MINEXIII_GENERATOR_ONLY='${MINEXIII_GENERATOR_ONLY}'" >> "${WD}"/${OUTPUT_DIR}/${CBEFF_LOG}
 
 # Run template creation
 echo -n "Generating templates... "
 cd "${WD}" && { time "${WD}"/${BINARY} create ${RANDOM_SEED}; } 2>&1 | \
-    tee "${WD}"/${OUTPUT_DIR}/${CREATE_LOG} > /dev/null 
+    tee "${WD}"/${OUTPUT_DIR}/${CREATE_LOG} > /dev/null
 if [ $? -ne 0 ]; then
 	fail 'An error occurred during template creation. Please review:' \
 	    "${WD}/${OUTPUT_DIR}/${CREATE_LOG}"
@@ -239,7 +263,7 @@ if [ $? -eq 0 ]; then
 	sed -i'' -e "/$CREATE_LOG_HEADER/d" "${WD}"/${OUTPUT_DIR}/${CREATE_LOG}
 	awk '{buf[NR-1]=$0;}END{for (i = 0; i < (NR - 4); i++) { print buf[i];}}' "${WD}"/${OUTPUT_DIR}/${CREATE_LOG} > "${CREATE_LOG_TEMP}"
 	sed -i'' -e "/$^/d" "${CREATE_LOG_TEMP}"
-	
+
 	sort "${CREATE_LOG_TEMP}" > "${WD}"/${OUTPUT_DIR}/${CREATE_LOG}
 
 	# Replace header and footer
@@ -302,14 +326,14 @@ if [ $? -eq 0 ]; then
 	sed -i'' -e "/$MATCH_LOG_HEADER/d" "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}
 	awk '{buf[NR-1]=$0;}END{for (i = 0; i < (NR - 4); i++) { print buf[i];}}' "${WD}"/${OUTPUT_DIR}/${MATCH_LOG} > "${MATCH_LOG_TEMP}"
 	sed -i'' -e "/$^/d" "${MATCH_LOG_TEMP}"
-	
+
 	sort "${MATCH_LOG_TEMP}" > "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}
 
 	# Replace header and footer
 	echo "$MATCH_LOG_HEADER" | cat - "${WD}"/${OUTPUT_DIR}/${MATCH_LOG} > "${MATCH_LOG_TEMP}" && mv "${MATCH_LOG_TEMP}" "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}
 	echo >> "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}
 	echo "${MATCH_LOG_FOOTER}" >> "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}
-fi 
+fi
 # Check lines of template matching log
 if [ `cat "${WD}"/${OUTPUT_DIR}/${MATCH_LOG} | wc -l` -ne 1725 ]; then
 	fail "Invalid number of lines in template matching log. Please review:"\
@@ -333,13 +357,21 @@ for line in `sed -n "2,1721 p" "${WD}"/${OUTPUT_DIR}/${MATCH_LOG}`; do
 	if [ $rv -ne 0 ]; then
 		unsuccessful_rv_m=1
 	fi
-	
+
 	similarity=`echo $line | awk '{print $4}'`
 	echo $similarity | grep -e "-1" > /dev/null
 	if [ $? -eq 0 ]; then
-		uses_neg1=1
+		if [ "${MINEXIII_GENERATOR_ONLY}" != "TRUE" ]; then
+			uses_neg1=1
+		fi
+	else
+		if [ "${MINEXIII_GENERATOR_ONLY}" == "TRUE" ]; then
+			msg="If you do not supply a template matcher, all "
+			msg+="match scores must be -1"
+			fail "${msg}"
+		fi
 	fi
-	
+
 done
 IFS=$OLDIFS
 echo "[OKAY]"
@@ -357,20 +389,8 @@ fi
 if [ $uses_neg1 -ne 0 ]; then
 	echo "*** [NOTE] -1 used as a similarity value. MINEX III uses ALL similarity values"
 	echo "    when calculating FNMR."
-fi
-
-# Warn about missing marketing name information
-if [ "${MINEXIII_GENERATOR_MARKETING_NAME}" == "" ]; then
-	echo "*** [NOTE] You have not provided a marketing name for your template generator."
-	echo "           If you wanted to do so, be sure to set the environment variable"
-	echo "           'MINEXIII_GENERATOR_MARKETING_NAME' before running so this"
-	echo "           information can be recorded."
-fi
-if [ "${MINEXIII_MATCHER_MARKETING_NAME}" == "" ]; then
-	echo "*** [NOTE] You have not provided a marketing name for your template matcher."
-	echo "           If you wanted to do so, be sure to set the environment variable"
-	echo "           'MINEXIII_MATCHER_MARKETING_NAME' before running so this"
-	echo "           information can be recorded."
+	echo "*** [NOTE] If you do not have a matching algorithm, please set the environment "
+	echo "    variable MINEXIII_GENERATOR_ONLY=TRUE and re-run this validation."
 fi
 
 #
@@ -418,9 +438,9 @@ gpg --output ${TAR_FILE}.asc \\
     --recipient jdoe@${COMPANY}.com --armor --sign --encrypt \\
     ${TAR_FILE}
 
-Additionally, be sure to include the public key of the identity that signed the 
+Additionally, be sure to include the public key of the identity that signed the
 validation package. This key must be the key whose fingerprint was printed on
-the MINEX III application. If it is not, you will be required to submit a new 
+the MINEX III application. If it is not, you will be required to submit a new
 application.
 
 Example public key extraction:
@@ -432,10 +452,9 @@ CBEFF_TG_ID=`head -n 2 "${WD}"/${OUTPUT_DIR}/${CBEFF_LOG} | tail -n 1 | awk '{pr
 if [ $CBEFF_TG_ID == "0000" ]; then
 	echo
 	echo "********************************************************************************
-IMPORTANT: If you are seeking client program compliance (such as PIV), you MUST
-register a CBEFF Product ID with IBIA, and set the appropriate values in
-get_pid(). NIST will not test algorithms for client program compliance without
-a registered CBEFF PID.
+IMPORTANT: You MUST register a CBEFF Product ID with IBIA, and set the
+appropriate values in get_pid(). NIST will not test algorithms without a
+registered CBEFF PID.
 ********************************************************************************
 "
 fi

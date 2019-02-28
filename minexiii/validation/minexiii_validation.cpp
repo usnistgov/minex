@@ -166,6 +166,8 @@ MINEXIII::readFile(
 	    std::ifstream::ate | std::ifstream::binary};
 	if (!file)
 		throw std::runtime_error{"Could not open " + pathName};
+	file.unsetf(std::ifstream::skipws);
+
 	uint64_t size = file.tellg() -
 	    std::ifstream::pos_type(std::ifstream::beg);
 	if (size == -1)
