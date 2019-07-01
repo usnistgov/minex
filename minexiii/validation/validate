@@ -143,6 +143,13 @@ if [ "${core_lib}" == "" ]; then
 	fail "No core library found. Please review library naming conventions."
 fi
 
+# Some file systems are case-sensitive
+cbeff_version_raw="$(echo ${core_lib} | awk -F_ '{print $3}' | sed 's/\..*//')"
+if [ "${cbeff_version_raw}" != "$(tr '[:lower:]' '[:upper:]' <<< ${cbeff_version_raw})" ]; then
+	correct="$(cut -f1 -d_ <<< ${core_lib})_$(cut -f2 -d_ <<< ${core_lib})_$(tr '[:lower:]' '[:upper:]' <<< ${cbeff_version_raw}).$(cut -f2 -d. <<< ${core_lib})"
+	fail "Please use uppercase hexadecimal digits (\"ABCDEF\" instead of \"abcdef\") for the version in your library name. Please rebuild \"${core_lib}\" as \"${correct}.\""
+fi
+
 # If SONAME is present, check that it is the same as the lib name
 file "${WD}"/${MINEX_LIB_DIR}/${core_lib} | grep shared > /dev/null
 if [ $? -eq 0 ]; then
@@ -154,7 +161,7 @@ if [ $? -eq 0 ]; then
 	fi
 fi
 COMPANY=`echo ${core_lib} | awk -F_ '{print $2}'`
-CBEFF_VERSION=`echo ${core_lib} | awk -F_ '{print $3}' | sed 's/\..*//' | tr '[:lower:]' '[:upper:]'`
+CBEFF_VERSION=`echo ${core_lib} | awk -F_ '{print $3}' | sed 's/\..*//'`
 echo "($core_lib) [OKAY]"
 
 # Check for configuration files
