@@ -72,9 +72,10 @@ How to Run
     submission does not contain a template matcher:
     - `export MINEXIII_GENERATOR_ONLY=TRUE`
  4. Execute `./validate`
- 5. If successful, sign *and* encrypt the resulting output archive, and e-mail
-    it, along with the encrypting identity's public key, to minex@nist.gov. If
-    unsuccessful, correct any errors detailed in the script output and try again.
+ 5. **If successful**, sign *and* encrypt the resulting output archive in a
+    single step, and upload it, along with the encrypting identity's public key,
+    and your original signed evaluation agreement via [the MINEX upload form].
+    If unsuccessful, correct any errors described and try again.
 
 Submission Contents
 -------------------
@@ -178,3 +179,4 @@ The items in this repository are released in the public domain. See the
 [NIST MINEX team]: mailto:minex@nist.gov
 
 [LICENSE]: https://github.com/usnistgov/minex/blob/master/LICENSE.md
+[the MINEX upload form]: https://pages.nist.gov/minex/upload

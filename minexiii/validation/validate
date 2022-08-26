@@ -435,7 +435,8 @@ echo "[OKAY]"
 echo "
 --------------------------------------------------------------------------------
 You have successfully completed the first step in MINEX III validation. Please
-sign and encrypt this file, send it to minex@nist.gov, and await a notification.
+sign and encrypt this file, upload it via https://pages.nist.gov/minex/upload,
+and await a notification.
 
 "${WD}"/${TAR_FILE}
 
