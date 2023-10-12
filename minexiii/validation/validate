@@ -210,8 +210,8 @@ if [ $? -ne 0 ]; then
 	fail "An error occurred during compilation. Please review:" \
 	    "${WD}/${OUTPUT_DIR}/${COMPILE_LOG}"
 fi
-md5sum "${WD}"/${MINEX_LIB_DIR}/* >> "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG}
-md5sum "${WD}"/${MINEX_CONFIG_DIR}/* >> "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG}
+find "${WD}"/${MINEX_LIB_DIR} "${WD}"/${MINEX_CONFIG_DIR} -type f \
+    -exec md5sum {} \; >> "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG}
 cat /etc/redhat-release >> "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG}
 ldd "${WD}"/${BINARY} >> "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG}
 echo "Validation Version = ${VALIDATION_VERSION}" >> "${WD}"/${OUTPUT_DIR}/${COMPILE_LOG}
