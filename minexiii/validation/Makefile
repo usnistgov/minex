@@ -22,7 +22,7 @@ endif
 ifeq ($(LIB_ARGS), )
         $(error You did not place your libraries in $(LOCALLIB))
 endif
-PARTICIPANT_LIB_OPT := -L$(LOCALLIB) $(LIB_ARGS)
+PARTICIPANT_LIB_OPT := -L$(LOCALLIB) -Wl,-rpath-link,$(realpath $(LOCALLIB)) $(LIB_ARGS)
 
 PROGRAM := minexiii_validation
 SOURCES := minexiii_validation.cpp
